@@ -1,37 +1,41 @@
-const FIREBASE_DOMAIN = 'https://quotes-17727-default-rtdb.firebaseio.com/';
+const QUOTES_API_DOMAIN = 'https://quotes-app-api-kvzz.onrender.com';
 
 export async function getAllQuotes() {
-  const response = await fetch(`${FIREBASE_DOMAIN}/quotes.json`);
+  const response = await fetch(`${QUOTES_API_DOMAIN}/quotes`);
   const data = await response.json();
 
-  if (!response.ok) {
+  if (response.status.code===500) {
     throw new Error(data.message || 'Could not fetch quotes.');
   }
 
+  // quote:{
+  //   author:"",
+  //   text:"",
+  //   _id:
+  // }
+
   const transformedQuotes = [];
 
-  for (const key in data) {
-    const quoteObj = {
-      id: key,
-      ...data[key],
-    };
-
-    transformedQuotes.push(quoteObj);
-  }
-
+  
+  data.forEach(quote => {
+    transformedQuotes.push({
+      ...quote,
+      id:quote._id
+    })
+  });
   return transformedQuotes;
 }
 
 export async function getSingleQuote(quoteId) {
-  const response = await fetch(`${FIREBASE_DOMAIN}/quotes/${quoteId}.json`);
+  const response = await fetch(`${QUOTES_API_DOMAIN}/quotes/${quoteId}`);
   const data = await response.json();
 
-  if (!response.ok) {
+  if (response.status.code===500) {
     throw new Error(data.message || 'Could not fetch quote.');
   }
 
   const loadedQuote = {
-    id: quoteId,
+    id: data._id,
     ...data,
   };
 
@@ -39,7 +43,7 @@ export async function getSingleQuote(quoteId) {
 }
 
 export async function addQuote(quoteData) {
-  const response = await fetch(`${FIREBASE_DOMAIN}/quotes.json`, {
+  const response = await fetch(`${QUOTES_API_DOMAIN}/quotes`, {
     method: 'POST',
     body: JSON.stringify(quoteData),
     headers: {
@@ -48,7 +52,7 @@ export async function addQuote(quoteData) {
   });
   const data = await response.json();
 
-  if (!response.ok) {
+  if (response.status.code===500) {
     throw new Error(data.message || 'Could not create quote.');
   }
 
@@ -56,41 +60,37 @@ export async function addQuote(quoteData) {
 }
 
 export async function addComment(requestData) {
-  const response = await fetch(`${FIREBASE_DOMAIN}/comments/${requestData.quoteId}.json`, {
+  const response = await fetch(`${QUOTES_API_DOMAIN}/quotes/${requestData.quoteId}/comments`, {
     method: 'POST',
-    body: JSON.stringify(requestData.commentData),
+    body: JSON.stringify(requestData),
     headers: {
       'Content-Type': 'application/json',
     },
   });
   const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || 'Could not add comment.');
+  if (response.status.code===500) {
+    throw new Error(data.message || 'Could not add a comment');
   }
 
-  return data.name ;
+  return data.author ;
 }
 
 export async function getAllComments(quoteId) {
-  const response = await fetch(`${FIREBASE_DOMAIN}/comments/${quoteId}.json`);
-
+  const response = await fetch(`${QUOTES_API_DOMAIN}/quotes/${quoteId}/comments`);
   const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || 'Could not get comments.');
+  if (response.status.code===500) {
+    throw new Error(data.message || 'Could not get comments');
   }
-
   const transformedComments = [];
 
-  for (const key in data) {
-    const commentObj = {
-      id: key,
-      text:data[key],
-    };
-
-    transformedComments.push(commentObj);
-  }
-
+  data.forEach(comment=>{
+   transformedComments.push({
+     text:comment.commentData,
+     id:comment._id
+   }) });
+   console.log(transformedComments);
   return transformedComments;
+ 
 }
+
+

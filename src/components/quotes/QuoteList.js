@@ -18,7 +18,6 @@ const QuoteList = (props) => {
   //will give information about the url we are currently on as key value pairs
   const location = useLocation();
   const history = useHistory();
-  console.log(props.quotes);
   //it will create a object which converts the search key's value string as a key value pair
   const queryParams = new URLSearchParams(location.search); //browser api
 
