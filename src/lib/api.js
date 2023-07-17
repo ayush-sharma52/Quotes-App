@@ -1,4 +1,4 @@
-const QUOTES_API_DOMAIN = 'https://quotes-app-api-kvzz.onrender.com';
+const QUOTES_API_DOMAIN = 'https://quotes-app-api-2kl6.onrender.com';
 
 export async function getAllQuotes() {
   const response = await fetch(`${QUOTES_API_DOMAIN}/quotes`);
